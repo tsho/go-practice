@@ -1,0 +1,1 @@
+go run ch04/ex08/main.go < ch04/ex08/main.go 

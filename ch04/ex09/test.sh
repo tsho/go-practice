@@ -1,0 +1,1 @@
+go run  ch04/ex09/main.go  ch04/ex09/test.txt
