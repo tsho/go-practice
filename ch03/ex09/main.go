@@ -14,26 +14,15 @@ import (
 )
 
 func main() {
-
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		if err := r.ParseForm(); err != nil {
 			log.Print(err)
 		}
-		x, err := strconv.ParseFloat(r.Form["x"][0], 64)
-		if err != nil || len(r.Form["x"]) < 0 {
-			x = 0
-		}
-		y, err := strconv.ParseFloat(r.Form["y"][0], 64)
-		if err != nil || len(r.Form["y"]) < 0{
-			y = 0
-		}
-		zoom, err := strconv.ParseFloat(r.Form["zoom"][0], 64)
-		if err != nil || len(r.Form["zoom"]) < 0 {
-			zoom = 0
-		}
+		x := parseFirstFloat64OrDefault(r.Form["x"], 0)
+		y := parseFirstFloat64OrDefault(r.Form["y"], 0)
+		zoom := parseFirstFloat64OrDefault(r.Form["zoom"], 0)
 		renderPNG(w, x, y, zoom)
 	}
-
 	http.HandleFunc("/", handler)
 
 	fmt.Println("Listening at http://localhost:8000")
