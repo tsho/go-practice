@@ -54,9 +54,9 @@ func corner(i, j int) (float64, float64) {
 }
 
 func f(x, y float64) float64 {
-	r := x*x + y*y
+	r := (math.Pow(y, 2)/64 - math.Pow(x, 2)/128) / 2
 
-	return math.Sin(r) / r
+	return r
 }
 
 func isFinite(f float64) bool {
