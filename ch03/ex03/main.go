@@ -26,10 +26,11 @@ func main() {
 			bx, by := corner(i, j)
 			cx, cy := corner(i, j+1)
 			dx, dy := corner(i+1, j+1)
+			r, g, b := color(i, j)
 			if isFinite(ax) && isFinite(ay) && isFinite(bx) && isFinite(by) &&
 				isFinite(cx) && isFinite(cy) && isFinite(dx) && isFinite(dy) {
-					fmt.Printf("<polygon points='%g,%g %g,%g %g,%g %g,%g'/>\n",
-					ax, ay, bx, by, cx, cy, dx, dy)
+					fmt.Printf("<polygon points='%g,%g %g,%g %g,%g %g,%g' fill=\"rgb(%d,%d,%d)\"/>\n",
+					ax, ay, bx, by, cx, cy, dx, dy, r, g, b)
 			} else {
 				fmt.Printf("!!!!!!!!!!!! skip !!!!!!!!!!!!!!!!!!!!!!!!")
 			}
@@ -54,7 +55,7 @@ func corner(i, j int) (float64, float64) {
 }
 
 func f(x, y float64) float64 {
-	r := math.Sqrt(x*x + y*y)
+	r := math.Hypot(x, y) // distance from (0,0)
 
 	return math.Sin(r) / r
 }
@@ -67,4 +68,12 @@ func isFinite(f float64) bool {
 		return false
 	}
 	return true
+}
+
+func color(i, j int) (int, int, int) {
+	z := f(xyrange*(float64(i)/cells-0.5), xyrange*(float64(j)/cells-0.5))
+	r := 255 * math.Abs(z)
+	g := 255 - r
+	b := 255 - r
+	return int(r), int(g), int(b)
 }
