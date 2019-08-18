@@ -1,2 +1,2 @@
-go build main.go                                                                   !18074
+go build main.go
 ./fetch https://golang.org | ./main 
