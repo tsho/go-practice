@@ -16,8 +16,6 @@ import (
 	"golang.org/x/net/html"
 )
 
-// tokens is a counting semaphore used to
-// enforce a limit of 20 concurrent requests.
 var tokens = make(chan struct{}, 20)
 var maxDepth int
 var seen = make(map[string]bool)
@@ -50,7 +48,6 @@ func crawl(url string, depth int, wg *sync.WaitGroup) {
 	}
 }
 
-// Copied from gopl.io/ch5/outline2.
 func forEachNode(n *html.Node, pre, post func(n *html.Node)) {
 	if pre != nil {
 		pre(n)
@@ -82,13 +79,11 @@ func linkURLs(linkNodes []*html.Node, base *url.URL) []string {
 				continue
 			}
 			link, err := base.Parse(a.Val)
-			// ignore bad and non-local URLs
 			if err != nil {
 				log.Printf("skipping %q: %s", a.Val, err)
 				continue
 			}
 			if link.Host != base.Host {
-				//log.Printf("skipping %q: non-local host", a.Val)
 				continue
 			}
 			urls = append(urls, link.String())
@@ -97,8 +92,6 @@ func linkURLs(linkNodes []*html.Node, base *url.URL) []string {
 	return urls
 }
 
-// rewriteLocalLinks rewrites local links to be relative and links without
-// extensions to point to index.html, eg /hi/there -> /hi/there/index.html.
 func rewriteLocalLinks(linkNodes []*html.Node, base *url.URL) {
 	for _, n := range linkNodes {
 		for i, a := range n.Attr {
@@ -107,9 +100,8 @@ func rewriteLocalLinks(linkNodes []*html.Node, base *url.URL) {
 			}
 			link, err := base.Parse(a.Val)
 			if err != nil || link.Host != base.Host {
-				continue // ignore bad and non-local URLs
+				continue
 			}
-			// Clear fields so the url is formatted as /PATH?QUERY#FRAGMENT
 			link.Scheme = ""
 			link.Host = ""
 			link.User = nil
@@ -149,7 +141,7 @@ func visit(rawurl string) (urls []string, err error) {
 			return nil, fmt.Errorf("parsing %s as HTML: %v", u, err)
 		}
 		nodes := linkNodes(doc)
-		urls = linkURLs(nodes, u) // Extract links before they're rewritten.
+		urls = linkURLs(nodes, u)
 		rewriteLocalLinks(nodes, u)
 		b := &bytes.Buffer{}
 		err = html.Render(b, doc)
@@ -162,8 +154,6 @@ func visit(rawurl string) (urls []string, err error) {
 	return urls, err
 }
 
-// If resp.Body has already been consumed, `body` can be passed and will be
-// read instead.
 func save(resp *http.Response, body io.Reader) error {
 	u := resp.Request.URL
 	filename := filepath.Join(u.Host, u.Path)
@@ -187,7 +177,7 @@ func save(resp *http.Response, body io.Reader) error {
 	if err != nil {
 		log.Print("save: ", err)
 	}
-	// Check for delayed write errors, as mentioned at the end of section 5.8.
+
 	err = file.Close()
 	if err != nil {
 		log.Print("save: ", err)
